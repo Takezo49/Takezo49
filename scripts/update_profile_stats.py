@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import os
@@ -10,13 +11,11 @@ import pathlib
 import re
 import urllib.error
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 
 LOGIN = "Takezo49"
 GRAPHQL_URL = "https://api.github.com/graphql"
-STATS_STYLE_VERSION = 2
-GRAPH_STYLE_VERSION = 2
 OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "assets" / "stats.svg"
 GRAPH_OUTPUT = (
     pathlib.Path(__file__).resolve().parents[1]
@@ -77,8 +76,13 @@ def account_summary() -> dict:
           ownerAffiliations: OWNER
           privacy: PUBLIC
         ) {
+          totalCount
           nodes {
             stargazerCount
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
           }
         }
       }
@@ -119,12 +123,45 @@ def account_summary() -> dict:
         )
         cursor = contributed["pageInfo"]["endCursor"]
 
+    owned = user["repositories"]
+    repository_count = owned["totalCount"]
+    stars = sum(repo["stargazerCount"] for repo in owned["nodes"])
+    cursor = owned["pageInfo"]["endCursor"]
+
+    while owned["pageInfo"]["hasNextPage"]:
+        page_query = """
+        query($login: String!, $after: String!) {
+          user(login: $login) {
+            repositories(
+              first: 100
+              after: $after
+              ownerAffiliations: OWNER
+              privacy: PUBLIC
+            ) {
+              nodes {
+                stargazerCount
+              }
+              pageInfo {
+                endCursor
+                hasNextPage
+              }
+            }
+          }
+        }
+        """
+        owned = graphql(
+            page_query,
+            {"login": LOGIN, "after": cursor},
+        )["user"]["repositories"]
+        stars += sum(repo["stargazerCount"] for repo in owned["nodes"])
+        cursor = owned["pageInfo"]["endCursor"]
+
     return {
         "_user_id": user["id"],
         "_repositories": repositories,
         "created_at": datetime.fromisoformat(user["createdAt"].replace("Z", "+00:00")),
-        "repositories": len(repositories),
-        "stars": sum(repo["stargazerCount"] for repo in user["repositories"]["nodes"]),
+        "repositories": repository_count,
+        "stars": stars,
     }
 
 
@@ -233,6 +270,38 @@ def contribution_period(start: datetime, end: datetime) -> dict:
     return graphql(query, variables)["user"]["contributionsCollection"]
 
 
+def calculate_streaks(days: dict[str, int], today: date) -> tuple[int, int]:
+    dated_counts = {
+        date.fromisoformat(day): count
+        for day, count in days.items()
+        if date.fromisoformat(day) <= today
+    }
+    if not dated_counts:
+        return 0, 0
+
+    longest = run = 0
+    previous_day: date | None = None
+    for day in sorted(dated_counts):
+        count = dated_counts[day]
+        if count:
+            run = run + 1 if previous_day == day - timedelta(days=1) else 1
+            longest = max(longest, run)
+        else:
+            run = 0
+        previous_day = day
+
+    cursor = today
+    if dated_counts.get(cursor, 0) == 0:
+        cursor -= timedelta(days=1)
+
+    current = 0
+    while dated_counts.get(cursor, 0) > 0:
+        current += 1
+        cursor -= timedelta(days=1)
+
+    return current, longest
+
+
 def contribution_stats(created_at: datetime, now: datetime) -> dict:
     totals = {
         "contributions": 0,
@@ -254,21 +323,7 @@ def contribution_stats(created_at: datetime, now: datetime) -> dict:
             for day in week["contributionDays"]:
                 days[day["date"]] = day["contributionCount"]
 
-    longest = current = run = 0
-    ordered_days = sorted(days.items())
-    for _, count in ordered_days:
-        run = run + 1 if count else 0
-        longest = max(longest, run)
-
-    # A zero-contribution current day does not break a streak ending yesterday.
-    started = False
-    for _, count in reversed(ordered_days):
-        if not started and not count:
-            continue
-        if not count:
-            break
-        started = True
-        current += 1
+    current, longest = calculate_streaks(days, now.date())
 
     return {
         **totals,
@@ -293,6 +348,8 @@ def render_svg(stats: dict, now: datetime) -> str:
         </g>"""
         for index, (label, value) in enumerate(values)
     )
+    current_unit = "DAY" if stats["current_streak"] == 1 else "DAYS"
+    longest_unit = "DAY" if stats["longest_streak"] == 1 else "DAYS"
 
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-label="Live GitHub statistics for {LOGIN}">
   <defs>
@@ -333,9 +390,9 @@ def render_svg(stats: dict, now: datetime) -> str:
   <path d="M42 185H1158" stroke="#1b625a"/>
   <g transform="translate(42 222)">
     <text class="label">CURRENT STREAK</text>
-    <text class="streak" x="145">{stats["current_streak"]} DAYS</text>
+    <text class="streak" x="145">{stats["current_streak"]} {current_unit}</text>
     <text class="label" x="345">LONGEST STREAK</text>
-    <text class="streak" x="492">{stats["longest_streak"]} DAYS</text>
+    <text class="streak" x="492">{stats["longest_streak"]} {longest_unit}</text>
     <text class="meta" x="790">SYNCED HOURLY FROM GITHUB</text>
   </g>
 </svg>
@@ -344,10 +401,10 @@ def render_svg(stats: dict, now: datetime) -> str:
 
 def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
     end = now.date()
-    start = end - timedelta(days=30)
+    start = end - timedelta(days=29)
     activity = [
         (start + timedelta(days=index), days.get((start + timedelta(days=index)).isoformat(), 0))
-        for index in range(31)
+        for index in range(30)
     ]
     chart_left = 82
     chart_right = 1150
@@ -442,12 +499,14 @@ def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
 """
 
 
-def update_readme_cache_key(contributions: int, lines: int) -> None:
+def update_readme_cache_keys() -> None:
     content = README.read_text(encoding="utf-8")
     updated = content
     assets = {
-        "stats.svg": f"{contributions}-{lines}-{STATS_STYLE_VERSION}",
-        "contribution-graph.svg": f"{contributions}-{GRAPH_STYLE_VERSION}",
+        "stats.svg": hashlib.sha256(OUTPUT.read_bytes()).hexdigest()[:12],
+        "contribution-graph.svg": hashlib.sha256(
+            GRAPH_OUTPUT.read_bytes()
+        ).hexdigest()[:12],
     }
     for asset, cache_key in assets.items():
         updated, matches = re.subn(
@@ -477,7 +536,7 @@ def main() -> None:
         render_contribution_graph(stats["days"], now),
         encoding="utf-8",
     )
-    update_readme_cache_key(stats["contributions"], stats["lines_written"])
+    update_readme_cache_keys()
     print(
         json.dumps(
             {
