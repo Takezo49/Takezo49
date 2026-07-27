@@ -20,11 +20,11 @@ Security researcher and founder of **[DataBlue](https://datablue.dev)**. I build
 ## `> github signal`
 
 <p align="center">
-  <img width="99%" src="./assets/stats.svg?v=870" alt="Live Takezo49 GitHub statistics" />
+  <img width="99%" src="./assets/stats.svg?v=871" alt="Live Takezo49 GitHub statistics" />
 </p>
 
 <p align="center">
-  <img width="99%" src="https://github-readme-activity-graph.vercel.app/graph?username=Takezo49&bg_color=071513&color=8cebe2&line=24ebd9&point=ffffff&area=true&area_color=24ebd9&hide_border=false&custom_title=Contribution%20Activity" alt="Takezo49 contribution activity" />
+  <img width="99%" src="./assets/contribution-graph.svg?v=871" alt="Live Takezo49 contribution activity" />
 </p>
 
 ## `> engineering matrix`

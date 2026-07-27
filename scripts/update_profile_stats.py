@@ -10,12 +10,17 @@ import pathlib
 import re
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 
 LOGIN = "Takezo49"
 GRAPHQL_URL = "https://api.github.com/graphql"
 OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "assets" / "stats.svg"
+GRAPH_OUTPUT = (
+    pathlib.Path(__file__).resolve().parents[1]
+    / "assets"
+    / "contribution-graph.svg"
+)
 README = pathlib.Path(__file__).resolve().parents[1] / "README.md"
 
 
@@ -143,7 +148,12 @@ def contribution_stats(created_at: datetime, now: datetime) -> dict:
         started = True
         current += 1
 
-    return {**totals, "current_streak": current, "longest_streak": longest}
+    return {
+        **totals,
+        "current_streak": current,
+        "longest_streak": longest,
+        "days": days,
+    }
 
 
 def render_svg(stats: dict, now: datetime) -> str:
@@ -211,16 +221,123 @@ def render_svg(stats: dict, now: datetime) -> str:
 """
 
 
+def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
+    end = now.date()
+    start = end - timedelta(days=364)
+    # Align the grid to Sunday so weekdays stay in consistent rows.
+    display_start = start - timedelta(days=(start.weekday() + 1) % 7)
+    week_count = ((end - display_start).days // 7) + 1
+    cell = 13
+    gap = 6
+    pitch = cell + gap
+    grid_x = 92
+    grid_y = 82
+
+    def color(count: int) -> str:
+        if count <= 0:
+            return "#0b211e"
+        if count <= 2:
+            return "#0e4f46"
+        if count <= 5:
+            return "#118a79"
+        if count <= 9:
+            return "#19c4b1"
+        return "#24ebd9"
+
+    cells: list[str] = []
+    cursor = display_start
+    while cursor <= end:
+        week = (cursor - display_start).days // 7
+        weekday = (cursor.weekday() + 1) % 7
+        count = days.get(cursor.isoformat(), 0)
+        opacity = "0.28" if cursor < start else "1"
+        cells.append(
+            f'<rect x="{grid_x + week * pitch}" y="{grid_y + weekday * pitch}" '
+            f'width="{cell}" height="{cell}" rx="2" fill="{color(count)}" '
+            f'opacity="{opacity}"><title>{cursor.isoformat()}: {count} contributions</title></rect>'
+        )
+        cursor += timedelta(days=1)
+
+    month_labels: list[str] = []
+    cursor = date(start.year, start.month, 1)
+    if cursor < start:
+        cursor = date(
+            start.year + (1 if start.month == 12 else 0),
+            1 if start.month == 12 else start.month + 1,
+            1,
+        )
+    while cursor <= end:
+        week = (cursor - display_start).days // 7
+        month_labels.append(
+            f'<text class="month" x="{grid_x + week * pitch}" y="67">'
+            f"{cursor.strftime('%b')}</text>"
+        )
+        cursor = date(
+            cursor.year + (1 if cursor.month == 12 else 0),
+            1 if cursor.month == 12 else cursor.month + 1,
+            1,
+        )
+
+    rolling_total = sum(
+        count
+        for day, count in days.items()
+        if start <= date.fromisoformat(day) <= end
+    )
+    grid_width = week_count * pitch
+    legend_x = min(1010, grid_x + grid_width - 165)
+    legend = "".join(
+        f'<rect x="{legend_x + index * 20}" y="228" width="12" height="12" rx="2" fill="{shade}"/>'
+        for index, shade in enumerate(
+            ["#0b211e", "#0e4f46", "#118a79", "#19c4b1", "#24ebd9"]
+        )
+    )
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="270" viewBox="0 0 1200 270" role="img" aria-label="Live rolling-year contribution activity for {LOGIN}">
+  <defs>
+    <linearGradient id="panel" x1="0" x2="1">
+      <stop offset="0" stop-color="#071513"/>
+      <stop offset="1" stop-color="#091b18"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .title {{ font: 700 15px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #24ebd9; letter-spacing: 1.5px; }}
+      .total {{ font: 700 24px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }}
+      .month, .weekday, .meta {{ font: 500 10px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #75afa8; }}
+    </style>
+  </defs>
+  <rect x="1" y="1" width="1198" height="268" rx="12" fill="url(#panel)" stroke="#1b625a"/>
+  <circle cx="41" cy="33" r="5" fill="#24ebd9" filter="url(#glow)"/>
+  <text class="title" x="58" y="39">CONTRIBUTION ACTIVITY // ROLLING YEAR</text>
+  <text class="total" x="1158" y="39" text-anchor="end">{rolling_total:,}</text>
+  <text class="meta" x="1158" y="57" text-anchor="end">ACCOUNT-VISIBLE CONTRIBUTIONS</text>
+  {''.join(month_labels)}
+  <text class="weekday" x="44" y="{grid_y + pitch + 10}">MON</text>
+  <text class="weekday" x="44" y="{grid_y + pitch * 3 + 10}">WED</text>
+  <text class="weekday" x="44" y="{grid_y + pitch * 5 + 10}">FRI</text>
+  {''.join(cells)}
+  <text class="meta" x="42" y="238">SOURCE: GITHUB GRAPHQL // SYNCED HOURLY</text>
+  <text class="meta" x="{legend_x - 38}" y="238">LESS</text>
+  {legend}
+  <text class="meta" x="{legend_x + 105}" y="238">MORE</text>
+</svg>
+"""
+
+
 def update_readme_cache_key(contributions: int) -> None:
     content = README.read_text(encoding="utf-8")
-    updated = re.sub(
-        r'(\./assets/stats\.svg)(?:\?v=\d+)?',
-        rf"\1?v={contributions}",
-        content,
-        count=1,
-    )
-    if updated == content and f"./assets/stats.svg?v={contributions}" not in content:
-        raise RuntimeError("Could not locate the statistics image in README.md")
+    updated = content
+    for asset in ("stats.svg", "contribution-graph.svg"):
+        updated, matches = re.subn(
+            rf"(\./assets/{re.escape(asset)})(?:\?v=\d+)?",
+            rf"\1?v={contributions}",
+            updated,
+            count=1,
+        )
+        if matches != 1:
+            raise RuntimeError(f"Could not locate {asset} in README.md")
     README.write_text(updated, encoding="utf-8")
 
 
@@ -233,8 +350,20 @@ def main() -> None:
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(render_svg(stats, now), encoding="utf-8")
+    GRAPH_OUTPUT.write_text(
+        render_contribution_graph(stats["days"], now),
+        encoding="utf-8",
+    )
     update_readme_cache_key(stats["contributions"])
-    print(json.dumps({key: value for key, value in stats.items() if key != "created_at"}))
+    print(
+        json.dumps(
+            {
+                key: value
+                for key, value in stats.items()
+                if key not in {"created_at", "days"}
+            }
+        )
+    )
 
 
 if __name__ == "__main__":
