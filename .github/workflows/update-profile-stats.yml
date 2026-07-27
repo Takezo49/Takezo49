@@ -26,7 +26,7 @@ jobs:
 
       - name: Generate statistics card
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
         run: python scripts/update_profile_stats.py
 
       - name: Publish updated statistics

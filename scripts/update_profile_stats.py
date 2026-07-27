@@ -18,9 +18,9 @@ OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "assets" / "stats.svg"
 
 
 def graphql(query: str, variables: dict | None = None) -> dict:
-    token = os.environ.get("GITHUB_TOKEN")
+    token = os.environ.get("PROFILE_STATS_TOKEN") or os.environ.get("GITHUB_TOKEN")
     if not token:
-        raise RuntimeError("GITHUB_TOKEN is required")
+        raise RuntimeError("PROFILE_STATS_TOKEN or GITHUB_TOKEN is required")
 
     request = urllib.request.Request(
         GRAPHQL_URL,
