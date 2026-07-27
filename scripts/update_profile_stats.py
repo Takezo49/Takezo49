@@ -203,7 +203,7 @@ def render_svg(stats: dict, now: datetime) -> str:
     <text class="streak" x="145">{stats["current_streak"]} DAYS</text>
     <text class="label" x="345">LONGEST STREAK</text>
     <text class="streak" x="492">{stats["longest_streak"]} DAYS</text>
-    <text class="meta" x="790">UPDATED {now.strftime("%Y-%m-%d %H:%M UTC")}</text>
+    <text class="meta" x="790">SYNCED HOURLY FROM GITHUB</text>
   </g>
 </svg>
 """
