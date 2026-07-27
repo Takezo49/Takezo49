@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">Takezo49 - Security Researcher and DataBlue Founder</title>
+  <desc id="desc">A dark cyan technology banner with security, web intelligence, and distributed systems motifs.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#030807"/>
+      <stop offset="0.55" stop-color="#071513"/>
+      <stop offset="1" stop-color="#0a211d"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#24ebd9"/>
+      <stop offset="1" stop-color="#89fff3"/>
+    </linearGradient>
+    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
+      <path d="M 42 0 L 0 0 0 42" fill="none" stroke="#24ebd9" stroke-opacity="0.055" stroke-width="1"/>
+      <circle cx="0" cy="0" r="1.5" fill="#24ebd9" fill-opacity="0.18"/>
+    </pattern>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="360" rx="18" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1198" height="358" rx="17" fill="none" stroke="#24ebd9" stroke-opacity="0.35" stroke-width="2"/>
+  <rect width="1200" height="360" rx="18" fill="url(#grid)"/>
+
+  <path d="M0 286 C210 238 342 335 559 274 S880 216 1200 280 L1200 360 L0 360 Z" fill="#24ebd9" fill-opacity="0.035"/>
+  <path d="M0 296 C210 248 342 345 559 284 S880 226 1200 290" fill="none" stroke="#24ebd9" stroke-opacity="0.18" stroke-width="1"/>
+
+  <g transform="translate(70 64)">
+    <rect x="0" y="0" width="114" height="26" rx="13" fill="#24ebd9" fill-opacity="0.11" stroke="#24ebd9" stroke-opacity="0.55"/>
+    <circle cx="17" cy="13" r="4" fill="#24ebd9" filter="url(#glow)"/>
+    <text x="29" y="17" fill="#9dfff6" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="1.7">ONLINE</text>
+
+    <text x="0" y="93" fill="#f3fffd" font-family="Arial, Helvetica, sans-serif" font-size="66" font-weight="800" letter-spacing="2">TAKEZO49</text>
+    <rect x="0" y="111" width="490" height="3" rx="1.5" fill="url(#cyan)"/>
+    <text x="0" y="151" fill="#24ebd9" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" letter-spacing="2.4">SECURITY RESEARCHER</text>
+    <text x="0" y="184" fill="#bcefe9" font-family="Arial, Helvetica, sans-serif" font-size="17" letter-spacing="1.2">FOUNDER @ DATABLUE</text>
+
+    <g transform="translate(0 220)" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="1">
+      <rect width="138" height="34" rx="7" fill="#081c19" stroke="#24ebd9" stroke-opacity="0.45"/>
+      <text x="69" y="22" fill="#bffff8" text-anchor="middle">WEB INTELLIGENCE</text>
+      <rect x="151" width="151" height="34" rx="7" fill="#081c19" stroke="#24ebd9" stroke-opacity="0.45"/>
+      <text x="226.5" y="22" fill="#bffff8" text-anchor="middle">DISTRIBUTED SYSTEMS</text>
+      <rect x="315" width="112" height="34" rx="7" fill="#081c19" stroke="#24ebd9" stroke-opacity="0.45"/>
+      <text x="371" y="22" fill="#bffff8" text-anchor="middle">AI PIPELINES</text>
+    </g>
+  </g>
+
+  <g transform="translate(785 39)">
+    <circle cx="169" cy="141" r="121" fill="#24ebd9" fill-opacity="0.025" stroke="#24ebd9" stroke-opacity="0.12"/>
+    <circle cx="169" cy="141" r="92" fill="none" stroke="#24ebd9" stroke-opacity="0.2" stroke-dasharray="4 9"/>
+    <circle cx="169" cy="141" r="62" fill="#061310" stroke="#24ebd9" stroke-opacity="0.45"/>
+
+    <path d="M169 77 L219 97 V137 C219 174 198 198 169 211 C140 198 119 174 119 137 V97 Z" fill="#24ebd9" fill-opacity="0.08" stroke="#24ebd9" stroke-width="3" filter="url(#glow)"/>
+    <path d="M145 141 L161 157 L194 123" fill="none" stroke="#d8fffb" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g fill="#24ebd9">
+      <circle cx="42" cy="65" r="5"/>
+      <circle cx="296" cy="77" r="5"/>
+      <circle cx="43" cy="226" r="5"/>
+      <circle cx="300" cy="219" r="5"/>
+      <circle cx="169" cy="2" r="5"/>
+      <circle cx="169" cy="279" r="5"/>
+    </g>
+    <g stroke="#24ebd9" stroke-opacity="0.55" fill="none" stroke-width="1.5">
+      <path d="M47 65 H88 L119 100"/>
+      <path d="M291 77 H251 L219 103"/>
+      <path d="M48 226 H89 L124 180"/>
+      <path d="M295 219 H252 L215 177"/>
+      <path d="M169 7 V49"/>
+      <path d="M169 233 V274"/>
+    </g>
+
+    <g font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" letter-spacing="1.2" fill="#94d9d2">
+      <text x="0" y="49">RESEARCH</text>
+      <text x="283" y="60">DEFEND</text>
+      <text x="2" y="249">AUTOMATE</text>
+      <text x="275" y="242">SCALE</text>
+    </g>
+  </g>
+
+  <g transform="translate(1027 300)" font-family="monospace" font-size="11" fill="#24ebd9" opacity="0.8">
+    <text x="0" y="0">SYSTEM: ACTIVE</text>
+    <text x="0" y="18">FOCUS: BUILD</text>
+  </g>
+</svg>
