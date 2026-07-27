@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="570" viewBox="0 0 1200 570" role="img" aria-labelledby="title desc">
+  <title id="title">Takezo49 Technology Stack</title>
+  <desc id="desc">A categorized technology matrix for security research, software engineering, web intelligence, infrastructure, and artificial intelligence.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#030807"/>
+      <stop offset="1" stop-color="#081a17"/>
+    </linearGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#24ebd9" fill-opacity="0.08"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="570" rx="18" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1198" height="568" rx="17" fill="none" stroke="#24ebd9" stroke-opacity="0.3" stroke-width="2"/>
+  <rect width="1200" height="570" rx="18" fill="url(#dots)"/>
+
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="48" y="56" fill="#f3fffd" font-size="28" font-weight="800">ENGINEERING MATRIX</text>
+    <text x="48" y="83" fill="#65bdb4" font-size="13" letter-spacing="2">SECURITY-FIRST SYSTEMS / PRODUCTION INFRASTRUCTURE / AI-READY DATA</text>
+
+    <g transform="translate(48 112)">
+      <g transform="translate(0 0)">
+        <rect width="105" height="50" rx="8" fill="#24ebd9" fill-opacity="0.12" stroke="#24ebd9" stroke-opacity="0.5"/>
+        <text x="16" y="21" fill="#24ebd9" font-size="10" font-weight="800" letter-spacing="1.5">01</text>
+        <text x="16" y="38" fill="#eafffd" font-size="12" font-weight="700">SECURITY</text>
+        <g transform="translate(126 0)" font-size="13" font-weight="700" fill="#cafffa">
+          <rect width="126" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="63" y="30" text-anchor="middle">Burp Suite</text>
+          <rect x="138" width="105" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="190.5" y="30" text-anchor="middle">OWASP</text>
+          <rect x="255" width="92" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="301" y="30" text-anchor="middle">Nmap</text>
+          <rect x="359" width="103" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="410.5" y="30" text-anchor="middle">Linux</text>
+          <rect x="474" width="161" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="554.5" y="30" text-anchor="middle">Threat Research</text>
+        </g>
+      </g>
+
+      <g transform="translate(0 66)">
+        <rect width="105" height="50" rx="8" fill="#24ebd9" fill-opacity="0.12" stroke="#24ebd9" stroke-opacity="0.5"/>
+        <text x="16" y="21" fill="#24ebd9" font-size="10" font-weight="800" letter-spacing="1.5">02</text>
+        <text x="16" y="38" fill="#eafffd" font-size="12" font-weight="700">LANGUAGES</text>
+        <g transform="translate(126 0)" font-size="13" font-weight="700" fill="#cafffa">
+          <rect width="104" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="52" y="30" text-anchor="middle">Python</text>
+          <rect x="116" width="132" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="182" y="30" text-anchor="middle">TypeScript</text>
+          <rect x="260" width="110" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="315" y="30" text-anchor="middle">Go</text>
+          <rect x="382" width="94" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="429" y="30" text-anchor="middle">Rust</text>
+          <rect x="488" width="98" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="537" y="30" text-anchor="middle">Dart</text>
+        </g>
+      </g>
+
+      <g transform="translate(0 132)">
+        <rect width="105" height="50" rx="8" fill="#24ebd9" fill-opacity="0.12" stroke="#24ebd9" stroke-opacity="0.5"/>
+        <text x="16" y="21" fill="#24ebd9" font-size="10" font-weight="800" letter-spacing="1.5">03</text>
+        <text x="16" y="38" fill="#eafffd" font-size="12" font-weight="700">PRODUCT</text>
+        <g transform="translate(126 0)" font-size="13" font-weight="700" fill="#cafffa">
+          <rect width="111" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="55.5" y="30" text-anchor="middle">FastAPI</text>
+          <rect x="123" width="109" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="177.5" y="30" text-anchor="middle">Next.js</text>
+          <rect x="244" width="106" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="297" y="30" text-anchor="middle">React</text>
+          <rect x="362" width="123" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="423.5" y="30" text-anchor="middle">Tailwind</text>
+          <rect x="497" width="118" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="556" y="30" text-anchor="middle">REST APIs</text>
+        </g>
+      </g>
+
+      <g transform="translate(0 198)">
+        <rect width="105" height="50" rx="8" fill="#24ebd9" fill-opacity="0.12" stroke="#24ebd9" stroke-opacity="0.5"/>
+        <text x="16" y="21" fill="#24ebd9" font-size="10" font-weight="800" letter-spacing="1.5">04</text>
+        <text x="16" y="38" fill="#eafffd" font-size="12" font-weight="700">DATA</text>
+        <g transform="translate(126 0)" font-size="13" font-weight="700" fill="#cafffa">
+          <rect width="127" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="63.5" y="30" text-anchor="middle">PostgreSQL</text>
+          <rect x="139" width="98" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="188" y="30" text-anchor="middle">Redis</text>
+          <rect x="249" width="106" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="302" y="30" text-anchor="middle">Celery</text>
+          <rect x="367" width="122" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="428" y="30" text-anchor="middle">Pipelines</text>
+          <rect x="501" width="130" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="566" y="30" text-anchor="middle">Vector Data</text>
+        </g>
+      </g>
+
+      <g transform="translate(0 264)">
+        <rect width="105" height="50" rx="8" fill="#24ebd9" fill-opacity="0.12" stroke="#24ebd9" stroke-opacity="0.5"/>
+        <text x="16" y="21" fill="#24ebd9" font-size="10" font-weight="800" letter-spacing="1.5">05</text>
+        <text x="16" y="38" fill="#eafffd" font-size="12" font-weight="700">RUNTIME</text>
+        <g transform="translate(126 0)" font-size="13" font-weight="700" fill="#cafffa">
+          <rect width="105" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="52.5" y="30" text-anchor="middle">Docker</text>
+          <rect x="117" width="102" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="168" y="30" text-anchor="middle">Nginx</text>
+          <rect x="231" width="120" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="291" y="30" text-anchor="middle">Chromium</text>
+          <rect x="363" width="124" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="425" y="30" text-anchor="middle">Playwright</text>
+          <rect x="499" width="139" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="568.5" y="30" text-anchor="middle">GitHub Actions</text>
+        </g>
+      </g>
+
+      <g transform="translate(0 330)">
+        <rect width="105" height="50" rx="8" fill="#24ebd9" fill-opacity="0.12" stroke="#24ebd9" stroke-opacity="0.5"/>
+        <text x="16" y="21" fill="#24ebd9" font-size="10" font-weight="800" letter-spacing="1.5">06</text>
+        <text x="16" y="38" fill="#eafffd" font-size="12" font-weight="700">AI SYSTEMS</text>
+        <g transform="translate(126 0)" font-size="13" font-weight="700" fill="#cafffa">
+          <rect width="126" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="63" y="30" text-anchor="middle">LLM Agents</text>
+          <rect x="138" width="105" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="190.5" y="30" text-anchor="middle">RAG</text>
+          <rect x="255" width="141" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="325.5" y="30" text-anchor="middle">Deep Research</text>
+          <rect x="408" width="162" height="50" rx="8" fill="#0b201d" stroke="#1e5d56"/><text x="489" y="30" text-anchor="middle">Browser Agents</text>
+        </g>
+      </g>
+    </g>
+
+    <g transform="translate(864 112)">
+      <rect width="288" height="380" rx="12" fill="#06110f" stroke="#24ebd9" stroke-opacity="0.35"/>
+      <text x="24" y="34" fill="#24ebd9" font-size="11" font-weight="800" letter-spacing="2">SYSTEM FOCUS</text>
+
+      <g transform="translate(144 138)">
+        <circle r="49" fill="#24ebd9" fill-opacity="0.09" stroke="#24ebd9"/>
+        <circle r="8" fill="#24ebd9"/>
+        <text y="82" fill="#f0fffd" text-anchor="middle" font-size="14" font-weight="800">DATABLUE</text>
+        <text y="101" fill="#6dbbb3" text-anchor="middle" font-size="10" letter-spacing="1">CORE PLATFORM</text>
+      </g>
+
+      <g fill="#071513" stroke="#24ebd9" stroke-opacity="0.7">
+        <circle cx="55" cy="78" r="28"/><circle cx="233" cy="78" r="28"/>
+        <circle cx="55" cy="245" r="28"/><circle cx="233" cy="245" r="28"/>
+      </g>
+      <g fill="#d9fffb" font-size="10" font-weight="700" text-anchor="middle">
+        <text x="55" y="75">SECURITY</text><text x="55" y="88">RESEARCH</text>
+        <text x="233" y="75">WEB</text><text x="233" y="88">DATA</text>
+        <text x="55" y="242">DISTRIBUTED</text><text x="55" y="255">RUNTIME</text>
+        <text x="233" y="242">AI</text><text x="233" y="255">PIPELINES</text>
+      </g>
+      <g stroke="#24ebd9" stroke-opacity="0.45" fill="none" stroke-width="2">
+        <path d="M78 95 L112 119"/><path d="M210 95 L176 119"/>
+        <path d="M78 228 L112 193"/><path d="M210 228 L176 193"/>
+      </g>
+
+      <rect x="24" y="310" width="240" height="44" rx="7" fill="#24ebd9" fill-opacity="0.08" stroke="#24ebd9" stroke-opacity="0.35"/>
+      <circle cx="45" cy="332" r="5" fill="#24ebd9"/>
+      <text x="60" y="336" fill="#bafff8" font-size="11" font-weight="700" letter-spacing="1">BUILD. TEST. OBSERVE. SCALE.</text>
+    </g>
+  </g>
+</svg>
