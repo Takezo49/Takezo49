@@ -30,13 +30,13 @@
   <g transform="translate(42 48)">
     <circle cx="7" cy="7" r="6" fill="#24ebd9" filter="url(#glow)"/>
     <text class="eyebrow" x="24" y="12">GITHUB SIGNAL // LIVE</text>
-    <text class="hero" y="92">871</text>
+    <text class="hero" y="92">865</text>
     <text class="label" y="120">TOTAL CONTRIBUTIONS</text>
   </g>
   
         <g transform="translate(430 94)">
           <text class="label">COMMITS</text>
-          <text class="value" y="42">858</text>
+          <text class="value" y="42">855</text>
         </g>
         
 
@@ -48,13 +48,13 @@
 
         <g transform="translate(800 94)">
           <text class="label">REPOSITORIES</text>
-          <text class="value" y="42">8</text>
+          <text class="value" y="42">6</text>
         </g>
         
 
         <g transform="translate(985 94)">
           <text class="label">STARS</text>
-          <text class="value" y="42">2</text>
+          <text class="value" y="42">5</text>
         </g>
         
   <path d="M42 185H1158" stroke="#1b625a"/>
