@@ -35,7 +35,7 @@
   </g>
           <g transform="translate(400 94)">
           <text class="label">LINES WRITTEN</text>
-          <text class="value" y="42">456,423</text>
+          <text class="value" y="42">456,786</text>
         </g>
         <g transform="translate(550 94)">
           <text class="label">COMMITS</text>
@@ -43,7 +43,7 @@
         </g>
         <g transform="translate(700 94)">
           <text class="label">REPOSITORIES</text>
-          <text class="value" y="42">6</text>
+          <text class="value" y="42">5</text>
         </g>
         <g transform="translate(850 94)">
           <text class="label">PULL REQUESTS</text>
@@ -56,7 +56,7 @@
   <path d="M42 185H1158" stroke="#1b625a"/>
   <g transform="translate(42 222)">
     <text class="label">CURRENT STREAK</text>
-    <text class="streak" x="145">1 DAYS</text>
+    <text class="streak" x="145">1 DAY</text>
     <text class="label" x="345">LONGEST STREAK</text>
     <text class="streak" x="492">10 DAYS</text>
     <text class="meta" x="790">SYNCED HOURLY FROM GITHUB</text>
