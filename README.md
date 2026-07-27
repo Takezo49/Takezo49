@@ -20,7 +20,7 @@ Security researcher and founder of **[DataBlue](https://datablue.dev)**. I build
 ## `> github signal`
 
 <p align="center">
-  <img width="99%" src="./assets/stats.svg" alt="Live Takezo49 GitHub statistics" />
+  <img width="99%" src="./assets/stats.svg?v=870" alt="Live Takezo49 GitHub statistics" />
 </p>
 
 <p align="center">

@@ -7,6 +7,7 @@ import html
 import json
 import os
 import pathlib
+import re
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
@@ -15,6 +16,7 @@ from datetime import datetime, timezone
 LOGIN = "Takezo49"
 GRAPHQL_URL = "https://api.github.com/graphql"
 OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "assets" / "stats.svg"
+README = pathlib.Path(__file__).resolve().parents[1] / "README.md"
 
 
 def graphql(query: str, variables: dict | None = None) -> dict:
@@ -209,6 +211,19 @@ def render_svg(stats: dict, now: datetime) -> str:
 """
 
 
+def update_readme_cache_key(contributions: int) -> None:
+    content = README.read_text(encoding="utf-8")
+    updated = re.sub(
+        r'(\./assets/stats\.svg)(?:\?v=\d+)?',
+        rf"\1?v={contributions}",
+        content,
+        count=1,
+    )
+    if updated == content and f"./assets/stats.svg?v={contributions}" not in content:
+        raise RuntimeError("Could not locate the statistics image in README.md")
+    README.write_text(updated, encoding="utf-8")
+
+
 def main() -> None:
     now = datetime.now(timezone.utc)
     summary = account_summary()
@@ -218,6 +233,7 @@ def main() -> None:
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(render_svg(stats, now), encoding="utf-8")
+    update_readme_cache_key(stats["contributions"])
     print(json.dumps({key: value for key, value in stats.items() if key != "created_at"}))
 
 
