@@ -10,12 +10,13 @@
 
 ## `> whoami`
 
-Security researcher and founder of **[DataBlue](https://datablue.dev)**. I build production web-intelligence systems, browser automation, distributed scraping infrastructure, and AI-ready data pipelines.
+Security researcher, AI engineer, and full-stack systems builder. I work across application security, LLM agents, deep research, distributed backends, developer tooling, and production product engineering. I am also the founder of **[DataBlue](https://datablue.dev)**.
 
-- Building **DataBlue**, an infrastructure platform for clean web and search data.
-- Engineering with **Python, TypeScript, FastAPI, Next.js, PostgreSQL, Redis, and Docker**.
-- Exploring **deep-research agents, browser orchestration, and scalable extraction systems**.
-- Working security-first: understand the system, test the boundary, then make it resilient.
+## `> tech stack`
+
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=python,ts,js,go,rust,dart,nodejs,react,nextjs,fastapi,tailwind,vite,pytorch,tensorflow,postgres,redis,docker,nginx,linux,git,githubactions,bash&perline=11&theme=dark" alt="Takezo49 technology stack" />
+</p>
 
 ## `> github signal`
 
@@ -25,12 +26,6 @@ Security researcher and founder of **[DataBlue](https://datablue.dev)**. I build
 
 <p align="center">
   <img width="99%" src="./assets/contribution-graph.svg?v=871-2" alt="Live Takezo49 contribution activity" />
-</p>
-
-## `> engineering matrix`
-
-<p align="center">
-  <img src="./assets/tech-stack.svg" width="100%" alt="Takezo49 technology stack" />
 </p>
 
 ## `> featured systems`
