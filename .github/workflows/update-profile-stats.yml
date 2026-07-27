@@ -27,6 +27,7 @@ jobs:
       - name: Generate statistics card
         env:
           PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
+          PROFILE_TIMEZONE: Asia/Kolkata
         run: python scripts/update_profile_stats.py
 
       - name: Publish updated statistics

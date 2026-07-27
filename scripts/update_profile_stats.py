@@ -12,6 +12,7 @@ import re
 import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 LOGIN = "Takezo49"
@@ -270,6 +271,17 @@ def contribution_period(start: datetime, end: datetime) -> dict:
     return graphql(query, variables)["user"]["contributionsCollection"]
 
 
+def profile_today(now: datetime) -> date:
+    timezone_name = os.environ.get("PROFILE_TIMEZONE", "UTC")
+    try:
+        profile_timezone = ZoneInfo(timezone_name)
+    except ZoneInfoNotFoundError as exc:
+        raise RuntimeError(
+            f"Invalid PROFILE_TIMEZONE: {timezone_name}"
+        ) from exc
+    return now.astimezone(profile_timezone).date()
+
+
 def calculate_streaks(days: dict[str, int], today: date) -> tuple[int, int]:
     dated_counts = {
         date.fromisoformat(day): count
@@ -323,7 +335,7 @@ def contribution_stats(created_at: datetime, now: datetime) -> dict:
             for day in week["contributionDays"]:
                 days[day["date"]] = day["contributionCount"]
 
-    current, longest = calculate_streaks(days, now.date())
+    current, longest = calculate_streaks(days, profile_today(now))
 
     return {
         **totals,
@@ -400,7 +412,7 @@ def render_svg(stats: dict, now: datetime) -> str:
 
 
 def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
-    end = now.date()
+    end = profile_today(now)
     start = end - timedelta(days=29)
     activity = [
         (start + timedelta(days=index), days.get((start + timedelta(days=index)).isoformat(), 0))

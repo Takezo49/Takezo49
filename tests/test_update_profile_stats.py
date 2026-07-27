@@ -141,6 +141,30 @@ class LinesWrittenTests(unittest.TestCase):
 
 
 class StreakTests(unittest.TestCase):
+    def test_profile_date_uses_configured_timezone(self) -> None:
+        now = datetime(2026, 7, 27, 21, 0, tzinfo=timezone.utc)
+        with mock.patch.dict(
+            profile_stats.os.environ,
+            {"PROFILE_TIMEZONE": "Asia/Kolkata"},
+        ):
+            self.assertEqual(
+                profile_stats.profile_today(now),
+                date(2026, 7, 28),
+            )
+
+    def test_invalid_profile_timezone_fails_clearly(self) -> None:
+        with mock.patch.dict(
+            profile_stats.os.environ,
+            {"PROFILE_TIMEZONE": "Not/A-Timezone"},
+        ):
+            with self.assertRaisesRegex(
+                RuntimeError,
+                "Invalid PROFILE_TIMEZONE",
+            ):
+                profile_stats.profile_today(
+                    datetime(2026, 7, 28, tzinfo=timezone.utc)
+                )
+
     def test_counts_today_and_previous_consecutive_days(self) -> None:
         current, longest = profile_stats.calculate_streaks(
             {
@@ -236,6 +260,18 @@ class RenderingTests(unittest.TestCase):
         self.assertEqual(svg.count("<title>"), 30)
         self.assertIn("2026-07-01: 1 contributions", svg)
         self.assertIn("2026-07-30: 2 contributions", svg)
+
+    def test_contribution_graph_ends_on_profile_calendar_day(self) -> None:
+        now = datetime(2026, 7, 27, 21, 0, tzinfo=timezone.utc)
+        with mock.patch.dict(
+            profile_stats.os.environ,
+            {"PROFILE_TIMEZONE": "Asia/Kolkata"},
+        ):
+            svg = profile_stats.render_contribution_graph(
+                {"2026-07-28": 2},
+                now,
+            )
+        self.assertIn("2026-07-28: 2 contributions", svg)
 
     def test_cache_keys_follow_each_asset_content(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
