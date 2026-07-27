@@ -166,10 +166,15 @@ def account_summary() -> dict:
     }
 
 
-def lines_written(author_id: str, repositories: list[str]) -> int:
-    """Count additions from authored, non-merge commits without double counting."""
+def commit_stats(
+    author_id: str,
+    repositories: list[str],
+) -> tuple[int, dict[tuple[str, str], int]]:
+    """Count authored lines and collect UTC-to-profile-day commit moves."""
     total = 0
     seen_commits: set[str] = set()
+    day_moves: dict[tuple[str, str], int] = {}
+    profile_timezone = get_profile_timezone()
     query = """
     query(
       $owner: String!
@@ -189,6 +194,7 @@ def lines_written(author_id: str, repositories: list[str]) -> int:
                 nodes {
                   oid
                   additions
+                  authoredDate
                   parents(first: 2) {
                     totalCount
                   }
@@ -228,18 +234,30 @@ def lines_written(author_id: str, repositories: list[str]) -> int:
 
             history = target["history"]
             for commit in history["nodes"]:
-                if commit["parents"]["totalCount"] > 1:
-                    continue
                 if commit["oid"] in seen_commits:
                     continue
                 seen_commits.add(commit["oid"])
+
+                authored_at = datetime.fromisoformat(
+                    commit["authoredDate"].replace("Z", "+00:00")
+                )
+                utc_day = authored_at.astimezone(timezone.utc).date().isoformat()
+                profile_day = (
+                    authored_at.astimezone(profile_timezone).date().isoformat()
+                )
+                if utc_day != profile_day:
+                    move = (utc_day, profile_day)
+                    day_moves[move] = day_moves.get(move, 0) + 1
+
+                if commit["parents"]["totalCount"] > 1:
+                    continue
                 total += commit["additions"]
 
             if not history["pageInfo"]["hasNextPage"]:
                 break
             cursor = history["pageInfo"]["endCursor"]
 
-    return total
+    return total, day_moves
 
 
 def contribution_period(start: datetime, end: datetime) -> dict:
@@ -271,15 +289,32 @@ def contribution_period(start: datetime, end: datetime) -> dict:
     return graphql(query, variables)["user"]["contributionsCollection"]
 
 
-def profile_today(now: datetime) -> date:
+def get_profile_timezone() -> ZoneInfo:
     timezone_name = os.environ.get("PROFILE_TIMEZONE", "UTC")
     try:
-        profile_timezone = ZoneInfo(timezone_name)
+        return ZoneInfo(timezone_name)
     except ZoneInfoNotFoundError as exc:
         raise RuntimeError(
             f"Invalid PROFILE_TIMEZONE: {timezone_name}"
         ) from exc
-    return now.astimezone(profile_timezone).date()
+
+
+def profile_today(now: datetime) -> date:
+    return now.astimezone(get_profile_timezone()).date()
+
+
+def apply_commit_day_moves(
+    days: dict[str, int],
+    day_moves: dict[tuple[str, str], int],
+) -> dict[str, int]:
+    adjusted = dict(days)
+    for (utc_day, profile_day), requested_count in day_moves.items():
+        moved_count = min(adjusted.get(utc_day, 0), requested_count)
+        if moved_count <= 0:
+            continue
+        adjusted[utc_day] -= moved_count
+        adjusted[profile_day] = adjusted.get(profile_day, 0) + moved_count
+    return adjusted
 
 
 def calculate_streaks(days: dict[str, int], today: date) -> tuple[int, int]:
@@ -314,7 +349,11 @@ def calculate_streaks(days: dict[str, int], today: date) -> tuple[int, int]:
     return current, longest
 
 
-def contribution_stats(created_at: datetime, now: datetime) -> dict:
+def contribution_stats(
+    created_at: datetime,
+    now: datetime,
+    commit_day_moves: dict[tuple[str, str], int] | None = None,
+) -> dict:
     totals = {
         "contributions": 0,
         "commits": 0,
@@ -335,6 +374,7 @@ def contribution_stats(created_at: datetime, now: datetime) -> dict:
             for day in week["contributionDays"]:
                 days[day["date"]] = day["contributionCount"]
 
+    days = apply_commit_day_moves(days, commit_day_moves or {})
     current, longest = calculate_streaks(days, profile_today(now))
 
     return {
@@ -537,10 +577,15 @@ def main() -> None:
     summary = account_summary()
     author_id = summary.pop("_user_id")
     repositories = summary.pop("_repositories")
+    lines_written, commit_day_moves = commit_stats(author_id, repositories)
     stats = {
         **summary,
-        **contribution_stats(summary["created_at"], now),
-        "lines_written": lines_written(author_id, repositories),
+        **contribution_stats(
+            summary["created_at"],
+            now,
+            commit_day_moves,
+        ),
+        "lines_written": lines_written,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(render_svg(stats, now), encoding="utf-8")

@@ -96,11 +96,13 @@ class LinesWrittenTests(unittest.TestCase):
                     {
                         "oid": "first",
                         "additions": 10,
+                        "authoredDate": "2026-07-27T20:00:00Z",
                         "parents": {"totalCount": 1},
                     },
                     {
                         "oid": "merge",
                         "additions": 99,
+                        "authoredDate": "2026-07-27T21:00:00Z",
                         "parents": {"totalCount": 2},
                     },
                 ],
@@ -112,11 +114,13 @@ class LinesWrittenTests(unittest.TestCase):
                     {
                         "oid": "first",
                         "additions": 10,
+                        "authoredDate": "2026-07-27T20:00:00Z",
                         "parents": {"totalCount": 1},
                     },
                     {
                         "oid": "second",
                         "additions": 20,
+                        "authoredDate": "2026-07-28T10:00:00Z",
                         "parents": {"totalCount": 1},
                     },
                 ],
@@ -131,12 +135,20 @@ class LinesWrittenTests(unittest.TestCase):
             "graphql",
             side_effect=responses,
         ) as graphql:
-            total = profile_stats.lines_written(
-                "user-id",
-                ["owner/missing", "owner/repo", "owner/repo"],
-            )
+            with mock.patch.dict(
+                profile_stats.os.environ,
+                {"PROFILE_TIMEZONE": "Asia/Kolkata"},
+            ):
+                total, day_moves = profile_stats.commit_stats(
+                    "user-id",
+                    ["owner/missing", "owner/repo", "owner/repo"],
+                )
 
         self.assertEqual(total, 30)
+        self.assertEqual(
+            day_moves,
+            {("2026-07-27", "2026-07-28"): 2},
+        )
         self.assertEqual(graphql.call_count, 3)
 
 
@@ -164,6 +176,25 @@ class StreakTests(unittest.TestCase):
                 profile_stats.profile_today(
                     datetime(2026, 7, 28, tzinfo=timezone.utc)
                 )
+
+    def test_commit_day_moves_preserve_totals_and_shift_local_activity(self) -> None:
+        adjusted = profile_stats.apply_commit_day_moves(
+            {
+                "2026-07-27": 19,
+                "2026-07-28": 0,
+            },
+            {("2026-07-27", "2026-07-28"): 2},
+        )
+        self.assertEqual(adjusted["2026-07-27"], 17)
+        self.assertEqual(adjusted["2026-07-28"], 2)
+        self.assertEqual(sum(adjusted.values()), 19)
+        self.assertEqual(
+            profile_stats.calculate_streaks(
+                adjusted,
+                date(2026, 7, 28),
+            )[0],
+            2,
+        )
 
     def test_counts_today_and_previous_consecutive_days(self) -> None:
         current, longest = profile_stats.calculate_streaks(
