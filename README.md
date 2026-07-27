@@ -24,7 +24,7 @@ Security researcher and founder of **[DataBlue](https://datablue.dev)**. I build
 </p>
 
 <p align="center">
-  <img width="99%" src="./assets/contribution-graph.svg?v=871" alt="Live Takezo49 contribution activity" />
+  <img width="99%" src="./assets/contribution-graph.svg?v=871-2" alt="Live Takezo49 contribution activity" />
 </p>
 
 ## `> engineering matrix`

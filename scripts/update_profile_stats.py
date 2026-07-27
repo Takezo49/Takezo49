@@ -10,11 +10,12 @@ import pathlib
 import re
 import urllib.error
 import urllib.request
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 
 LOGIN = "Takezo49"
 GRAPHQL_URL = "https://api.github.com/graphql"
+GRAPH_STYLE_VERSION = 2
 OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "assets" / "stats.svg"
 GRAPH_OUTPUT = (
     pathlib.Path(__file__).resolve().parents[1]
@@ -223,80 +224,74 @@ def render_svg(stats: dict, now: datetime) -> str:
 
 def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
     end = now.date()
-    start = end - timedelta(days=364)
-    # Align the grid to Sunday so weekdays stay in consistent rows.
-    display_start = start - timedelta(days=(start.weekday() + 1) % 7)
-    week_count = ((end - display_start).days // 7) + 1
-    cell = 13
-    gap = 6
-    pitch = cell + gap
-    grid_x = 92
-    grid_y = 82
+    start = end - timedelta(days=30)
+    activity = [
+        (start + timedelta(days=index), days.get((start + timedelta(days=index)).isoformat(), 0))
+        for index in range(31)
+    ]
+    chart_left = 82
+    chart_right = 1150
+    chart_top = 82
+    chart_bottom = 288
+    chart_width = chart_right - chart_left
+    chart_height = chart_bottom - chart_top
+    maximum = max((count for _, count in activity), default=0)
+    axis_max = max(5, ((maximum + 4) // 5) * 5)
 
-    def color(count: int) -> str:
-        if count <= 0:
-            return "#0b211e"
-        if count <= 2:
-            return "#0e4f46"
-        if count <= 5:
-            return "#118a79"
-        if count <= 9:
-            return "#19c4b1"
-        return "#24ebd9"
+    points: list[tuple[float, float, str, int]] = []
+    for index, (day, count) in enumerate(activity):
+        x = chart_left + (chart_width * index / (len(activity) - 1))
+        y = chart_bottom - (chart_height * count / axis_max)
+        points.append((x, y, day.isoformat(), count))
 
-    cells: list[str] = []
-    cursor = display_start
-    while cursor <= end:
-        week = (cursor - display_start).days // 7
-        weekday = (cursor.weekday() + 1) % 7
-        count = days.get(cursor.isoformat(), 0)
-        opacity = "0.28" if cursor < start else "1"
-        cells.append(
-            f'<rect x="{grid_x + week * pitch}" y="{grid_y + weekday * pitch}" '
-            f'width="{cell}" height="{cell}" rx="2" fill="{color(count)}" '
-            f'opacity="{opacity}"><title>{cursor.isoformat()}: {count} contributions</title></rect>'
-        )
-        cursor += timedelta(days=1)
-
-    month_labels: list[str] = []
-    cursor = date(start.year, start.month, 1)
-    if cursor < start:
-        cursor = date(
-            start.year + (1 if start.month == 12 else 0),
-            1 if start.month == 12 else start.month + 1,
-            1,
-        )
-    while cursor <= end:
-        week = (cursor - display_start).days // 7
-        month_labels.append(
-            f'<text class="month" x="{grid_x + week * pitch}" y="67">'
-            f"{cursor.strftime('%b')}</text>"
-        )
-        cursor = date(
-            cursor.year + (1 if cursor.month == 12 else 0),
-            1 if cursor.month == 12 else cursor.month + 1,
-            1,
-        )
-
-    rolling_total = sum(
-        count
-        for day, count in days.items()
-        if start <= date.fromisoformat(day) <= end
+    line_path = " ".join(
+        f"{'M' if index == 0 else 'L'} {x:.2f} {y:.2f}"
+        for index, (x, y, _, _) in enumerate(points)
     )
-    grid_width = week_count * pitch
-    legend_x = min(1010, grid_x + grid_width - 165)
-    legend = "".join(
-        f'<rect x="{legend_x + index * 20}" y="228" width="12" height="12" rx="2" fill="{shade}"/>'
-        for index, shade in enumerate(
-            ["#0b211e", "#0e4f46", "#118a79", "#19c4b1", "#24ebd9"]
-        )
+    area_path = (
+        f"M {points[0][0]:.2f} {chart_bottom} "
+        + " ".join(f"L {x:.2f} {y:.2f}" for x, y, _, _ in points)
+        + f" L {points[-1][0]:.2f} {chart_bottom} Z"
+    )
+    point_nodes = "".join(
+        f'<circle cx="{x:.2f}" cy="{y:.2f}" r="3.6" fill="#f4fffd" '
+        f'stroke="#24ebd9" stroke-width="1.5"><title>{day}: {count} contributions</title></circle>'
+        for x, y, day, count in points
     )
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="270" viewBox="0 0 1200 270" role="img" aria-label="Live rolling-year contribution activity for {LOGIN}">
+    horizontal_grid: list[str] = []
+    for index in range(6):
+        value = axis_max * index // 5
+        y = chart_bottom - chart_height * index / 5
+        horizontal_grid.append(
+            f'<path d="M {chart_left} {y:.2f} H {chart_right}" class="grid"/>'
+            f'<text class="axis" x="{chart_left - 14}" y="{y + 4:.2f}" text-anchor="end">{value}</text>'
+        )
+
+    vertical_grid: list[str] = []
+    x_labels: list[str] = []
+    for index, (x, _, day, _) in enumerate(points):
+        if index % 3 != 0 and index != len(points) - 1:
+            continue
+        vertical_grid.append(
+            f'<path d="M {x:.2f} {chart_top} V {chart_bottom}" class="grid"/>'
+        )
+        label = datetime.fromisoformat(day).strftime("%d")
+        x_labels.append(
+            f'<text class="axis" x="{x:.2f}" y="{chart_bottom + 23}" text-anchor="middle">{label}</text>'
+        )
+
+    period_total = sum(count for _, count in activity)
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="Live 30-day contribution activity for {LOGIN}">
   <defs>
     <linearGradient id="panel" x1="0" x2="1">
       <stop offset="0" stop-color="#071513"/>
       <stop offset="1" stop-color="#091b18"/>
+    </linearGradient>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#24ebd9" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#24ebd9" stop-opacity=".02"/>
     </linearGradient>
     <filter id="glow">
       <feGaussianBlur stdDeviation="4" result="blur"/>
@@ -305,23 +300,24 @@ def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
     <style>
       .title {{ font: 700 15px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #24ebd9; letter-spacing: 1.5px; }}
       .total {{ font: 700 24px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }}
-      .month, .weekday, .meta {{ font: 500 10px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #75afa8; }}
+      .axis, .meta {{ font: 500 10px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #75afa8; }}
+      .grid {{ fill: none; stroke: #1b625a; stroke-width: 1; stroke-dasharray: 2 4; opacity: .72; }}
     </style>
   </defs>
-  <rect x="1" y="1" width="1198" height="268" rx="12" fill="url(#panel)" stroke="#1b625a"/>
+  <rect x="1" y="1" width="1198" height="358" rx="12" fill="url(#panel)" stroke="#1b625a"/>
   <circle cx="41" cy="33" r="5" fill="#24ebd9" filter="url(#glow)"/>
-  <text class="title" x="58" y="39">CONTRIBUTION ACTIVITY // ROLLING YEAR</text>
-  <text class="total" x="1158" y="39" text-anchor="end">{rolling_total:,}</text>
+  <text class="title" x="58" y="39">CONTRIBUTION ACTIVITY // LAST 30 DAYS</text>
+  <text class="total" x="1158" y="39" text-anchor="end">{period_total:,}</text>
   <text class="meta" x="1158" y="57" text-anchor="end">ACCOUNT-VISIBLE CONTRIBUTIONS</text>
-  {''.join(month_labels)}
-  <text class="weekday" x="44" y="{grid_y + pitch + 10}">MON</text>
-  <text class="weekday" x="44" y="{grid_y + pitch * 3 + 10}">WED</text>
-  <text class="weekday" x="44" y="{grid_y + pitch * 5 + 10}">FRI</text>
-  {''.join(cells)}
-  <text class="meta" x="42" y="238">SOURCE: GITHUB GRAPHQL // SYNCED HOURLY</text>
-  <text class="meta" x="{legend_x - 38}" y="238">LESS</text>
-  {legend}
-  <text class="meta" x="{legend_x + 105}" y="238">MORE</text>
+  {''.join(horizontal_grid)}
+  {''.join(vertical_grid)}
+  <path d="{area_path}" fill="url(#area)"/>
+  <path d="{line_path}" fill="none" stroke="#24ebd9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  {point_nodes}
+  {''.join(x_labels)}
+  <text class="meta" x="22" y="206" transform="rotate(-90 22 206)">CONTRIBUTIONS</text>
+  <text class="meta" x="616" y="338" text-anchor="middle">DAYS</text>
+  <text class="meta" x="1158" y="338" text-anchor="end">SOURCE: GITHUB GRAPHQL // SYNCED HOURLY</text>
 </svg>
 """
 
@@ -329,10 +325,14 @@ def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
 def update_readme_cache_key(contributions: int) -> None:
     content = README.read_text(encoding="utf-8")
     updated = content
-    for asset in ("stats.svg", "contribution-graph.svg"):
+    assets = {
+        "stats.svg": str(contributions),
+        "contribution-graph.svg": f"{contributions}-{GRAPH_STYLE_VERSION}",
+    }
+    for asset, cache_key in assets.items():
         updated, matches = re.subn(
-            rf"(\./assets/{re.escape(asset)})(?:\?v=\d+)?",
-            rf"\1?v={contributions}",
+            rf'(\./assets/{re.escape(asset)})(?:\?v=[^"\s]+)?',
+            rf"\1?v={cache_key}",
             updated,
             count=1,
         )
