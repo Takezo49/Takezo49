@@ -20,8 +20,7 @@ Security researcher and founder of **[DataBlue](https://datablue.dev)**. I build
 ## `> github signal`
 
 <p align="center">
-  <img width="49%" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=Takezo49&theme=github_dark" alt="Takezo49 GitHub statistics" />
-  <img width="49%" src="https://streak-stats.demolab.com?user=Takezo49&hide_border=false&border=1B625A&background=071513&ring=24EBD9&fire=24EBD9&currStreakLabel=24EBD9&sideLabels=BAFFF8&dates=75AFA8&sideNums=FFFFFF&currStreakNum=FFFFFF" alt="Takezo49 contribution streak" />
+  <img width="99%" src="./assets/stats.svg" alt="Live Takezo49 GitHub statistics" />
 </p>
 
 <p align="center">
