@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/header.svg" width="100%" alt="Takezo49 - Security Researcher and DataBlue Founder" />
+  <img src="./assets/header.svg" width="100%" alt="Raja - Security Researcher and DataBlue Founder" />
 </p>
 
 <p align="center">
@@ -21,7 +21,7 @@ Security researcher, AI engineer, and full-stack systems builder. I work across 
 ## `> github signal`
 
 <p align="center">
-  <img width="99%" src="./assets/stats.svg?v=865-456407" alt="Live Takezo49 GitHub statistics" />
+  <img width="99%" src="./assets/stats.svg?v=865-456407-2" alt="Live Takezo49 GitHub statistics" />
 </p>
 
 <p align="center">

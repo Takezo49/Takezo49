@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 
 LOGIN = "Takezo49"
 GRAPHQL_URL = "https://api.github.com/graphql"
+STATS_STYLE_VERSION = 2
 GRAPH_STYLE_VERSION = 2
 OUTPUT = pathlib.Path(__file__).resolve().parents[1] / "assets" / "stats.svg"
 GRAPH_OUTPUT = (
@@ -279,11 +280,11 @@ def contribution_stats(created_at: datetime, now: datetime) -> dict:
 
 def render_svg(stats: dict, now: datetime) -> str:
     values = [
-        ("COMMITS", stats["commits"]),
-        ("PULL REQUESTS", stats["pull_requests"]),
-        ("REPOSITORIES", stats["repositories"]),
-        ("STARS", stats["stars"]),
         ("LINES WRITTEN", stats["lines_written"]),
+        ("COMMITS", stats["commits"]),
+        ("REPOSITORIES", stats["repositories"]),
+        ("PULL REQUESTS", stats["pull_requests"]),
+        ("STARS", stats["stars"]),
     ]
     value_columns = "\n".join(
         f"""        <g transform="translate({400 + index * 150} 94)">
@@ -445,7 +446,7 @@ def update_readme_cache_key(contributions: int, lines: int) -> None:
     content = README.read_text(encoding="utf-8")
     updated = content
     assets = {
-        "stats.svg": f"{contributions}-{lines}",
+        "stats.svg": f"{contributions}-{lines}-{STATS_STYLE_VERSION}",
         "contribution-graph.svg": f"{contributions}-{GRAPH_STYLE_VERSION}",
     }
     for asset, cache_key in assets.items():

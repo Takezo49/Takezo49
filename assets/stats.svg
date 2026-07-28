@@ -34,24 +34,24 @@
     <text class="label" y="120">TOTAL CONTRIBUTIONS</text>
   </g>
           <g transform="translate(400 94)">
-          <text class="label">COMMITS</text>
-          <text class="value" y="42">855</text>
+          <text class="label">LINES WRITTEN</text>
+          <text class="value" y="42">456,407</text>
         </g>
         <g transform="translate(550 94)">
-          <text class="label">PULL REQUESTS</text>
-          <text class="value" y="42">3</text>
+          <text class="label">COMMITS</text>
+          <text class="value" y="42">855</text>
         </g>
         <g transform="translate(700 94)">
           <text class="label">REPOSITORIES</text>
           <text class="value" y="42">6</text>
         </g>
         <g transform="translate(850 94)">
-          <text class="label">STARS</text>
-          <text class="value" y="42">5</text>
+          <text class="label">PULL REQUESTS</text>
+          <text class="value" y="42">3</text>
         </g>
         <g transform="translate(1000 94)">
-          <text class="label">LINES WRITTEN</text>
-          <text class="value" y="42">456,407</text>
+          <text class="label">STARS</text>
+          <text class="value" y="42">5</text>
         </g>
   <path d="M42 185H1158" stroke="#1b625a"/>
   <g transform="translate(42 222)">
