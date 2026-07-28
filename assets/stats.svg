@@ -35,7 +35,7 @@
   </g>
           <g transform="translate(400 94)">
           <text class="label">LINES WRITTEN</text>
-          <text class="value" y="42">456,928</text>
+          <text class="value" y="42">470,468</text>
         </g>
         <g transform="translate(550 94)">
           <text class="label">COMMITS</text>
@@ -56,7 +56,7 @@
   <path d="M42 185H1158" stroke="#1b625a"/>
   <g transform="translate(42 222)">
     <text class="label">CURRENT STREAK</text>
-    <text class="streak" x="145">2 DAYS</text>
+    <text class="streak" x="145">3 DAYS</text>
     <text class="label" x="345">LONGEST STREAK</text>
     <text class="streak" x="492">10 DAYS</text>
     <text class="meta" x="790">SYNCED HOURLY FROM GITHUB</text>
