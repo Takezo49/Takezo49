@@ -55,13 +55,21 @@ def account_summary() -> dict:
     query = """
     query($login: String!) {
       user(login: $login) {
+        id
         createdAt
         repositoriesContributedTo(
-          first: 1
+          first: 100
           includeUserRepositories: true
           contributionTypes: [COMMIT, PULL_REQUEST]
         ) {
           totalCount
+          nodes {
+            nameWithOwner
+          }
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
         }
         repositories(
           first: 100
@@ -76,11 +84,123 @@ def account_summary() -> dict:
     }
     """
     user = graphql(query, {"login": LOGIN})["user"]
+    contributed = user["repositoriesContributedTo"]
+    repositories = [repo["nameWithOwner"] for repo in contributed["nodes"]]
+    cursor = contributed["pageInfo"]["endCursor"]
+
+    while contributed["pageInfo"]["hasNextPage"]:
+        page_query = """
+        query($login: String!, $after: String!) {
+          user(login: $login) {
+            repositoriesContributedTo(
+              first: 100
+              after: $after
+              includeUserRepositories: true
+              contributionTypes: [COMMIT, PULL_REQUEST]
+            ) {
+              nodes {
+                nameWithOwner
+              }
+              pageInfo {
+                endCursor
+                hasNextPage
+              }
+            }
+          }
+        }
+        """
+        contributed = graphql(
+            page_query,
+            {"login": LOGIN, "after": cursor},
+        )["user"]["repositoriesContributedTo"]
+        repositories.extend(
+            repo["nameWithOwner"] for repo in contributed["nodes"]
+        )
+        cursor = contributed["pageInfo"]["endCursor"]
+
     return {
+        "_user_id": user["id"],
+        "_repositories": repositories,
         "created_at": datetime.fromisoformat(user["createdAt"].replace("Z", "+00:00")),
-        "repositories": user["repositoriesContributedTo"]["totalCount"],
+        "repositories": len(repositories),
         "stars": sum(repo["stargazerCount"] for repo in user["repositories"]["nodes"]),
     }
+
+
+def lines_written(author_id: str, repositories: list[str]) -> int:
+    """Count additions from authored, non-merge commits without double counting."""
+    total = 0
+    seen_commits: set[str] = set()
+    query = """
+    query(
+      $owner: String!
+      $name: String!
+      $authorId: ID!
+      $after: String
+    ) {
+      repository(owner: $owner, name: $name) {
+        defaultBranchRef {
+          target {
+            ... on Commit {
+              history(
+                first: 100
+                after: $after
+                author: {id: $authorId}
+              ) {
+                nodes {
+                  oid
+                  additions
+                  parents(first: 2) {
+                    totalCount
+                  }
+                }
+                pageInfo {
+                  endCursor
+                  hasNextPage
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    for name_with_owner in sorted(set(repositories)):
+        owner, name = name_with_owner.split("/", 1)
+        cursor = None
+
+        while True:
+            data = graphql(
+                query,
+                {
+                    "owner": owner,
+                    "name": name,
+                    "authorId": author_id,
+                    "after": cursor,
+                },
+            )
+            target = (
+                ((data.get("repository") or {}).get("defaultBranchRef") or {})
+                .get("target")
+            )
+            if not target:
+                break
+
+            history = target["history"]
+            for commit in history["nodes"]:
+                if commit["parents"]["totalCount"] > 1:
+                    continue
+                if commit["oid"] in seen_commits:
+                    continue
+                seen_commits.add(commit["oid"])
+                total += commit["additions"]
+
+            if not history["pageInfo"]["hasNextPage"]:
+                break
+            cursor = history["pageInfo"]["endCursor"]
+
+    return total
 
 
 def contribution_period(start: datetime, end: datetime) -> dict:
@@ -163,14 +283,13 @@ def render_svg(stats: dict, now: datetime) -> str:
         ("PULL REQUESTS", stats["pull_requests"]),
         ("REPOSITORIES", stats["repositories"]),
         ("STARS", stats["stars"]),
+        ("LINES WRITTEN", stats["lines_written"]),
     ]
     value_columns = "\n".join(
-        f"""
-        <g transform="translate({430 + index * 185} 94)">
+        f"""        <g transform="translate({400 + index * 150} 94)">
           <text class="label">{html.escape(label)}</text>
           <text class="value" y="42">{value:,}</text>
-        </g>
-        """
+        </g>"""
         for index, (label, value) in enumerate(values)
     )
 
@@ -192,7 +311,7 @@ def render_svg(stats: dict, now: datetime) -> str:
       .eyebrow {{ font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #24ebd9; letter-spacing: 2px; }}
       .hero {{ font: 700 54px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }}
       .label {{ font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #75afa8; letter-spacing: 1px; }}
-      .value {{ font: 700 30px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }}
+      .value {{ font: 700 27px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }}
       .streak {{ font: 700 25px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #24ebd9; }}
       .meta {{ font: 500 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #75afa8; }}
     </style>
@@ -322,11 +441,11 @@ def render_contribution_graph(days: dict[str, int], now: datetime) -> str:
 """
 
 
-def update_readme_cache_key(contributions: int) -> None:
+def update_readme_cache_key(contributions: int, lines: int) -> None:
     content = README.read_text(encoding="utf-8")
     updated = content
     assets = {
-        "stats.svg": str(contributions),
+        "stats.svg": f"{contributions}-{lines}",
         "contribution-graph.svg": f"{contributions}-{GRAPH_STYLE_VERSION}",
     }
     for asset, cache_key in assets.items():
@@ -344,9 +463,12 @@ def update_readme_cache_key(contributions: int) -> None:
 def main() -> None:
     now = datetime.now(timezone.utc)
     summary = account_summary()
+    author_id = summary.pop("_user_id")
+    repositories = summary.pop("_repositories")
     stats = {
         **summary,
         **contribution_stats(summary["created_at"], now),
+        "lines_written": lines_written(author_id, repositories),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(render_svg(stats, now), encoding="utf-8")
@@ -354,7 +476,7 @@ def main() -> None:
         render_contribution_graph(stats["days"], now),
         encoding="utf-8",
     )
-    update_readme_cache_key(stats["contributions"])
+    update_readme_cache_key(stats["contributions"], stats["lines_written"])
     print(
         json.dumps(
             {

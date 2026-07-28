@@ -16,7 +16,7 @@
       .eyebrow { font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #24ebd9; letter-spacing: 2px; }
       .hero { font: 700 54px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }
       .label { font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #75afa8; letter-spacing: 1px; }
-      .value { font: 700 30px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }
+      .value { font: 700 27px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #f4fffd; }
       .streak { font: 700 25px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #24ebd9; }
       .meta { font: 500 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #75afa8; }
     </style>
@@ -30,37 +30,33 @@
   <g transform="translate(42 48)">
     <circle cx="7" cy="7" r="6" fill="#24ebd9" filter="url(#glow)"/>
     <text class="eyebrow" x="24" y="12">GITHUB SIGNAL // LIVE</text>
-    <text class="hero" y="92">865</text>
+    <text class="hero" y="92">866</text>
     <text class="label" y="120">TOTAL CONTRIBUTIONS</text>
   </g>
-  
-        <g transform="translate(430 94)">
+          <g transform="translate(400 94)">
           <text class="label">COMMITS</text>
-          <text class="value" y="42">855</text>
+          <text class="value" y="42">856</text>
         </g>
-        
-
-        <g transform="translate(615 94)">
+        <g transform="translate(550 94)">
           <text class="label">PULL REQUESTS</text>
           <text class="value" y="42">3</text>
         </g>
-        
-
-        <g transform="translate(800 94)">
+        <g transform="translate(700 94)">
           <text class="label">REPOSITORIES</text>
           <text class="value" y="42">6</text>
         </g>
-        
-
-        <g transform="translate(985 94)">
+        <g transform="translate(850 94)">
           <text class="label">STARS</text>
           <text class="value" y="42">5</text>
         </g>
-        
+        <g transform="translate(1000 94)">
+          <text class="label">LINES WRITTEN</text>
+          <text class="value" y="42">456,261</text>
+        </g>
   <path d="M42 185H1158" stroke="#1b625a"/>
   <g transform="translate(42 222)">
     <text class="label">CURRENT STREAK</text>
-    <text class="streak" x="145">1 DAYS</text>
+    <text class="streak" x="145">2 DAYS</text>
     <text class="label" x="345">LONGEST STREAK</text>
     <text class="streak" x="492">10 DAYS</text>
     <text class="meta" x="790">SYNCED HOURLY FROM GITHUB</text>
