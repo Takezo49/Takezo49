@@ -261,62 +261,78 @@ class StreakTests(unittest.TestCase):
         )
 
 
-class ReadmeStatsTests(unittest.TestCase):
-    @staticmethod
-    def stats() -> dict:
-        return {
-            "contributions": 871,
-            "lines_written": 471056,
-            "commits": 861,
-            "repositories": 5,
-            "pull_requests": 3,
-            "stars": 6,
-            "current_streak": 1,
-            "longest_streak": 10,
-        }
+class RenderingTests(unittest.TestCase):
+    def test_streak_units_are_singular(self) -> None:
+        svg = profile_stats.render_svg(
+            {
+                "contributions": 2,
+                "lines_written": 10,
+                "commits": 2,
+                "repositories": 1,
+                "pull_requests": 1,
+                "stars": 1,
+                "current_streak": 1,
+                "longest_streak": 1,
+            },
+            datetime(2026, 7, 28, tzinfo=timezone.utc),
+        )
+        self.assertIn(">1 DAY</text>", svg)
+        self.assertNotIn(">1 DAYS</text>", svg)
 
-    def test_renders_formatted_markdown_values_and_streak_units(self) -> None:
-        markdown = profile_stats.render_stats_markdown(self.stats())
-        self.assertIn("**471,056**", markdown)
-        self.assertIn("**1 day**", markdown)
-        self.assertIn("**10 days**", markdown)
-        self.assertNotIn("<svg", markdown)
+    def test_contribution_graph_contains_exactly_30_days(self) -> None:
+        now = datetime(2026, 7, 30, tzinfo=timezone.utc)
+        svg = profile_stats.render_contribution_graph(
+            {
+                "2026-07-01": 1,
+                "2026-07-30": 2,
+            },
+            now,
+        )
+        self.assertEqual(svg.count("<title>"), 30)
+        self.assertIn("2026-07-01: 1 contributions", svg)
+        self.assertIn("2026-07-30: 2 contributions", svg)
 
-    def test_replaces_only_the_managed_readme_block(self) -> None:
+    def test_contribution_graph_ends_on_profile_calendar_day(self) -> None:
+        now = datetime(2026, 7, 27, 21, 0, tzinfo=timezone.utc)
+        with mock.patch.dict(
+            profile_stats.os.environ,
+            {"PROFILE_TIMEZONE": "Asia/Kolkata"},
+        ):
+            svg = profile_stats.render_contribution_graph(
+                {"2026-07-28": 2},
+                now,
+            )
+        self.assertIn("2026-07-28: 2 contributions", svg)
+
+    def test_cache_keys_follow_each_asset_content(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = pathlib.Path(directory)
+            stats_output = root / "stats.svg"
+            graph_output = root / "contribution-graph.svg"
             readme = root / "README.md"
+            stats_output.write_text("stats-one", encoding="utf-8")
+            graph_output.write_text("graph-one", encoding="utf-8")
             readme.write_text(
-                "before\n"
-                f"{profile_stats.STATS_START}\n"
-                "old values\n"
-                f"{profile_stats.STATS_END}\n"
-                "after\n",
+                './assets/stats.svg?v=old"\n'
+                './assets/contribution-graph.svg?v=old"\n',
                 encoding="utf-8",
             )
 
-            with mock.patch.object(profile_stats, "README", readme):
-                profile_stats.update_readme_stats(self.stats())
+            with (
+                mock.patch.object(profile_stats, "OUTPUT", stats_output),
+                mock.patch.object(profile_stats, "GRAPH_OUTPUT", graph_output),
+                mock.patch.object(profile_stats, "README", readme),
+            ):
+                profile_stats.update_readme_cache_keys()
+                first = readme.read_text(encoding="utf-8")
+                stats_output.write_text("stats-two", encoding="utf-8")
+                profile_stats.update_readme_cache_keys()
+                second = readme.read_text(encoding="utf-8")
 
-            updated = readme.read_text(encoding="utf-8")
-            self.assertTrue(updated.startswith("before\n"))
-            self.assertTrue(updated.endswith("after\n"))
-            self.assertIn("**871**", updated)
-            self.assertNotIn("old values", updated)
-
-    def test_missing_markers_fail_without_rewriting_readme(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            readme = pathlib.Path(directory) / "README.md"
-            readme.write_text("unchanged\n", encoding="utf-8")
-
-            with mock.patch.object(profile_stats, "README", readme):
-                with self.assertRaisesRegex(
-                    RuntimeError,
-                    "statistics markers",
-                ):
-                    profile_stats.update_readme_stats(self.stats())
-
-            self.assertEqual(readme.read_text(encoding="utf-8"), "unchanged\n")
+            first_stats, first_graph = first.splitlines()
+            second_stats, second_graph = second.splitlines()
+            self.assertNotEqual(first_stats, second_stats)
+            self.assertEqual(first_graph, second_graph)
 
 
 if __name__ == "__main__":

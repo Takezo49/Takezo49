@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Update README statistics
+      - name: Generate live statistics cards
         env:
           PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
           PROFILE_TIMEZONE: Asia/Kolkata
@@ -32,11 +32,11 @@ jobs:
 
       - name: Publish updated statistics
         run: |
-          if git diff --quiet -- README.md; then
+          if git diff --quiet -- assets/stats.svg assets/contribution-graph.svg README.md; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md
+          git add assets/stats.svg assets/contribution-graph.svg README.md
           git commit -m "chore: refresh profile statistics"
           git push
