@@ -2,7 +2,7 @@ name: Update profile statistics
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
   push:
     branches:
@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate statistics card
+      - name: Update README statistics
         env:
           PROFILE_STATS_TOKEN: ${{ secrets.PROFILE_STATS_TOKEN }}
           PROFILE_TIMEZONE: Asia/Kolkata
@@ -32,11 +32,11 @@ jobs:
 
       - name: Publish updated statistics
         run: |
-          if git diff --quiet -- assets/stats.svg assets/contribution-graph.svg README.md; then
+          if git diff --quiet -- README.md; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/stats.svg assets/contribution-graph.svg README.md
+          git add README.md
           git commit -m "chore: refresh profile statistics"
           git push

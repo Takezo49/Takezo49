@@ -20,13 +20,17 @@ Security researcher, AI engineer, and full-stack systems builder. I work across 
 
 ## `> github signal`
 
-<p align="center">
-  <img width="99%" src="./assets/stats.svg?v=015c142f29b3" alt="Live Takezo49 GitHub statistics" />
-</p>
+<!-- github-stats:start -->
+| Total contributions | Lines written | Commits | Repositories | Pull requests | Stars |
+|---:|---:|---:|---:|---:|---:|
+| **876** | **471,138** | **866** | **5** | **3** | **6** |
 
-<p align="center">
-  <img width="99%" src="./assets/contribution-graph.svg?v=f0cda7b9c5bf" alt="Live Takezo49 contribution activity" />
-</p>
+| Current streak | Longest streak |
+|---:|---:|
+| **3 days** | **10 days** |
+
+<sub>Refresh scheduled every 15 minutes through GitHub GraphQL. GitHub renders the native contribution graph below this README.</sub>
+<!-- github-stats:end -->
 
 ## `> featured systems`
 
