@@ -21,7 +21,7 @@ Security researcher, AI engineer, and full-stack systems builder. I work across 
 ## `> github signal`
 
 <p align="center">
-  <img width="99%" src="./assets/stats.svg?v=fe8d99ff7145" alt="Live Takezo49 GitHub statistics" />
+  <img width="99%" src="./assets/stats.svg?v=70e4f698df14" alt="Live Takezo49 GitHub statistics" />
 </p>
 
 <p align="center">
