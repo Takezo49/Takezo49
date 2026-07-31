@@ -56,7 +56,7 @@
   <path d="M42 185H1158" stroke="#1b625a"/>
   <g transform="translate(42 222)">
     <text class="label">CURRENT STREAK</text>
-    <text class="streak" x="145">4 DAYS</text>
+    <text class="streak" x="145">0 DAYS</text>
     <text class="label" x="345">LONGEST STREAK</text>
     <text class="streak" x="492">10 DAYS</text>
     <text class="meta" x="790">SYNCED EVERY 15 MINUTES</text>
