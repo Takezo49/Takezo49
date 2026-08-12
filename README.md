@@ -25,7 +25,7 @@ Security researcher, AI engineer, and full-stack systems builder. I work across 
 </p>
 
 <p align="center">
-  <img width="99%" src="./assets/contribution-graph.svg?v=be3b0cd4986e" alt="Live Takezo49 contribution activity" />
+  <img width="99%" src="./assets/contribution-graph.svg?v=847ea14522ff" alt="Live Takezo49 contribution activity" />
 </p>
 
 ## `> featured systems`
