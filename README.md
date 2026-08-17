@@ -21,11 +21,11 @@ Security researcher, AI engineer, and full-stack systems builder. I work across 
 ## `> github signal`
 
 <p align="center">
-  <img width="99%" src="./assets/stats.svg?v=000b73100a22" alt="Live Takezo49 GitHub statistics" />
+  <img width="99%" src="./assets/stats.svg?v=b8f32330f075" alt="Live Takezo49 GitHub statistics" />
 </p>
 
 <p align="center">
-  <img width="99%" src="./assets/contribution-graph.svg?v=6daf32ad8851" alt="Live Takezo49 contribution activity" />
+  <img width="99%" src="./assets/contribution-graph.svg?v=3e6a239e0cea" alt="Live Takezo49 contribution activity" />
 </p>
 
 ## `> featured systems`
